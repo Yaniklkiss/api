@@ -1,0 +1,1197 @@
+{
+	"info": {
+		"_postman_id": "f366ac45-5b28-477d-b420-bbb69bc6ea2a",
+		"name": "DemoShopping",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38358228",
+		"_collection_link": "https://www.postman.com/yana-d/workspace/my-workspace/collection/38358228-f366ac45-5b28-477d-b420-bbb69bc6ea2a?action=share&source=collection_link&creator=38358228"
+	},
+	"item": [
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Возвращает список всех продуктов",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"\tpm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Response time is less than 700ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(700);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify that all values is correct\",function(){\r",
+									"    var responseJson = pm.response.json();\r",
+									"    var firstProduct = responseJson[0];\r",
+									"    pm.expect(firstProduct.id).to.be.a('number');\r",
+									"    pm.expect(firstProduct.name).to.be.a('string');\r",
+									"    pm.expect(firstProduct.description).to.be.a('string');\r",
+									"    pm.expect(firstProduct.price).to.be.a('number');\r",
+									"    pm.expect(firstProduct.category).to.be.a('string');\r",
+									"    pm.expect(firstProduct.manufacturer).to.be.a('string');\r",
+									"    pm.expect(firstProduct.imageUrl).to.be.a('string');\r",
+									"    pm.expect(firstProduct.freeShipping).to.be.a('boolean');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/products",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Добавление нового продукта",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Получаем тело ответа в виде строки\r",
+									"const responseText = pm.response.text();\r",
+									"\r",
+									"// Используем регулярное выражение для извлечения ID\r",
+									"const regex = /ID:\\s(\\d+)/;\r",
+									"const match = responseText.match(regex);\r",
+									"\r",
+									"// Проверяем, найден ли ID, и сохраняем его в переменную окружения\r",
+									"if (match) {\r",
+									"    const productID = match[1]; // Вытаскиваем первый найденный результат\r",
+									"    pm.collectionVariables.set(\"productID\", productID);\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"\tpm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Response time is less than 600ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(600);\r",
+									"});\r",
+									"pm.test(\"Response message\", function() {\r",
+									"    var text = pm.response.text();\r",
+									"    var productID = pm.collectionVariables.get(\"productID\");\r",
+									"    pm.expect(text).to.be.equal(\"Продукт успешно добавлен с ID: \" + productID);\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\r\n{\r\n  \"name\": \"{{$randomProductName}}\",\r\n  \"description\": \"{{$randomLoremText}}\" ,\r\n  \"price\": {{$randomPrice}},\r\n  \"category\": \"{{$randomProduct}}\",\r\n  \"manufacturer\":\"{{$randomCompanyName}}\" ,\r\n  \"imageUrl\": \"{{$randomImageUrl}}\",\r\n \"freeShipping\": {{$randomBoolean}}\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/add-product",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"add-product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Поиск товара по ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"\tpm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Verify that all values is correct\",function(){\r",
+									"    var responseJson = pm.response.json();\r",
+									"    pm.expect(responseJson.id).to.be.a('number');\r",
+									"    pm.expect(responseJson.name).to.be.a('string');\r",
+									"    pm.expect(responseJson.description).to.be.a('string');\r",
+									"    pm.expect(responseJson.price).to.be.a('number');\r",
+									"    pm.expect(responseJson.category).to.be.a('string');\r",
+									"    pm.expect(responseJson.manufacturer).to.be.a('string');\r",
+									"    pm.expect(responseJson.imageUrl).to.be.a('string');\r",
+									"    pm.expect(responseJson.freeShipping).to.be.a('boolean');\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/products/id/{{productID}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"products",
+								"id",
+								"{{productID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Полное обновление товара по ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"\tpm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Response time is less than 600ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(600);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response message\", function() {\r",
+									"    var text = pm.response.text();\r",
+									"    pm.expect(text).to.be.equal(\"Товар обновлён\")\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \r\n  \"name\": \"qaqa\",\r\n  \"description\": \"This is an example product.\",\r\n  \"price\": 190,\r\n  \"category\": \"Electronics\",\r\n  \"manufacturer\": \"Example Manufacturer\",\r\n  \"imageUrl\": \"http://example.com/image.jpg\",\r\n  \"freeShipping\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/products/id/{{productID}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"products",
+								"id",
+								"{{productID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Частичное обновление товара поID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"\tpm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response message\", function() {\r",
+									"    var text = pm.response.text();\r",
+									"    pm.expect(text).to.be.equal(\"Товар частично обновлён\")\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Example P\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/products/id/{{productID}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"products",
+								"id",
+								"{{productID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Удаление товара по ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"\tpm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Response time is less than 200ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response message\", function() {\r",
+									"    var text = pm.response.text();\r",
+									"    pm.expect(text).to.be.equal(\"Товар удалён\")\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/products/id/{{productID}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"products",
+								"id",
+								"{{productID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Поиск товаров по категории",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/products/FindByCategory?category=Electronics",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"products",
+								"FindByCategory"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "Electronics"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Поиск товаров по производителю",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/products/FindByManufacturer?manufacturer=Example Manufacturer",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"products",
+								"FindByManufacturer"
+							],
+							"query": [
+								{
+									"key": "manufacturer",
+									"value": "Example Manufacturer"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Поиск товаров с бесплатной доставкой",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/products/FindByShipping?freeShipping=true",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"products",
+								"FindByShipping"
+							],
+							"query": [
+								{
+									"key": "freeShipping",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Фильрация списка продуктов",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/products/filter?category=Electronics&manufacturer=Example Manufacturer&freeShipping=true&minPrice=10&maxPrice=99",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"products",
+								"filter"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "Electronics"
+								},
+								{
+									"key": "manufacturer",
+									"value": "Example Manufacturer"
+								},
+								{
+									"key": "freeShipping",
+									"value": "true"
+								},
+								{
+									"key": "minPrice",
+									"value": "10"
+								},
+								{
+									"key": "maxPrice",
+									"value": "99"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Авторизация пользователя",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"string\",\r\n  \"password\": \"string\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/login",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"login"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'POST' \\\r\n  'https://qa.demoshopping.ru/login' \\\r\n  -H 'accept: */*' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"username\": \"string\",\r\n  \"password\": \"string\"\r\n}'"
+					},
+					"response": []
+				},
+				{
+					"name": "Регистрация пользователя",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \r\n  \"username\": \"{{user}}\",\r\n  \"password\": \"{{pass}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/register",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"register"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'POST' \\\r\n  'https://qa.demoshopping.ru/register' \\\r\n  -H 'accept: */*' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"username\": \"string\",\r\n  \"password\": \"string\"\r\n}'"
+					},
+					"response": []
+				},
+				{
+					"name": "Получение всех user_Id и login пользователей",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/users",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'GET' \\\r\n  'https://qa.demoshopping.ru/users' \\\r\n  -H 'accept: application/json'"
+					},
+					"response": []
+				},
+				{
+					"name": "Добавление нового пользователя",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"string\",\r\n  \"password\": \"string\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/users",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'POST' \\\r\n  'https://qa.demoshopping.ru/users' \\\r\n  -H 'accept: */*' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"username\": \"string\",\r\n  \"password\": \"string\"\r\n}'"
+					},
+					"response": []
+				},
+				{
+					"name": "Удаление пользователя по ID",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							}
+						],
+						"url": {
+							"raw": "https://qa.demoshopping.ru/users/2212",
+							"protocol": "https",
+							"host": [
+								"qa",
+								"demoshopping",
+								"ru"
+							],
+							"path": [
+								"users",
+								"2212"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'DELETE' \\\r\n  'https://qa.demoshopping.ru/users/2212' \\\r\n  -H 'accept: */*'"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cart",
+			"item": [
+				{
+					"name": "Добавляет товар в корзину пользователя",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"productId\": {{productID}},\r\n  \"quantity\": {{$randomInt}}\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://qa.demoshopping.ru/cart",
+							"protocol": "https",
+							"host": [
+								"qa",
+								"demoshopping",
+								"ru"
+							],
+							"path": [
+								"cart"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'POST' \\\r\n  'https://qa.demoshopping.ru/cart' \\\r\n  -H 'accept: */*' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"productId\": 0,\r\n  \"quantity\": 0\r\n}'"
+					},
+					"response": []
+				},
+				{
+					"name": "Возвращает содержимое корзины",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Получаем тело ответа в формате JSON\r",
+									"var response = pm.response.json();\r",
+									"\r",
+									"// Извлекаем cart_item_id из первого элемента массива\r",
+									"var cartItemId = response[0].cart_item_id;\r",
+									"\r",
+									"// Сохраняем cart_item_id в переменную коллекции\r",
+									"pm.collectionVariables.set(\"cart_item_id\", cartItemId);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							}
+						],
+						"url": {
+							"raw": "https://qa.demoshopping.ru/getCart",
+							"protocol": "https",
+							"host": [
+								"qa",
+								"demoshopping",
+								"ru"
+							],
+							"path": [
+								"getCart"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'GET' \\\r\n  'https://qa.demoshopping.ru/getCart' \\\r\n  -H 'accept: */*'"
+					},
+					"response": []
+				},
+				{
+					"name": "Удаляет товар из корзины пользователя",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							}
+						],
+						"url": {
+							"raw": "https://qa.demoshopping.ru/cart/{{cart_item_id}}",
+							"protocol": "https",
+							"host": [
+								"qa",
+								"demoshopping",
+								"ru"
+							],
+							"path": [
+								"cart",
+								"{{cart_item_id}}"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'DELETE' \\\r\n  'https://qa.demoshopping.ru/cart/2212' \\\r\n  -H 'accept: */*'"
+					},
+					"response": []
+				},
+				{
+					"name": "Обновляет количество товара в корзине",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"quantity\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://qa.demoshopping.ru/cart/2212",
+							"protocol": "https",
+							"host": [
+								"qa",
+								"demoshopping",
+								"ru"
+							],
+							"path": [
+								"cart",
+								"2212"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'PATCH' \\\r\n  'https://qa.demoshopping.ru/cart/2212' \\\r\n  -H 'accept: */*' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"quantity\": 0\r\n}'"
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Получение списка всех заказов пользователя",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							}
+						],
+						"url": {
+							"raw": "https://qa.demoshopping.ru/user-orders",
+							"protocol": "https",
+							"host": [
+								"qa",
+								"demoshopping",
+								"ru"
+							],
+							"path": [
+								"user-orders"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'GET' \\\r\n  'https://qa.demoshopping.ru/user-orders' \\\r\n  -H 'accept: */*'"
+					},
+					"response": []
+				},
+				{
+					"name": "Создание заказа из товаров в корзине пользователя",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							}
+						],
+						"url": {
+							"raw": "https://qa.demoshopping.ru/orders",
+							"protocol": "https",
+							"host": [
+								"qa",
+								"demoshopping",
+								"ru"
+							],
+							"path": [
+								"orders"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'POST' \\\r\n  'https://qa.demoshopping.ru/orders' \\\r\n  -H 'accept: */*' \\\r\n  -d ''"
+					},
+					"response": []
+				},
+				{
+					"name": "Удаление товара из заказа",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							}
+						],
+						"url": {
+							"raw": "https://qa.demoshopping.ru/orders/1212/products/1213",
+							"protocol": "https",
+							"host": [
+								"qa",
+								"demoshopping",
+								"ru"
+							],
+							"path": [
+								"orders",
+								"1212",
+								"products",
+								"1213"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'DELETE' \\\r\n  'https://qa.demoshopping.ru/orders/1212/products/1213' \\\r\n  -H 'accept: */*'"
+					},
+					"response": []
+				},
+				{
+					"name": "Изменение количества товара в заказе",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"quantity\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://qa.demoshopping.ru/orders/1212/products/1213",
+							"protocol": "https",
+							"host": [
+								"qa",
+								"demoshopping",
+								"ru"
+							],
+							"path": [
+								"orders",
+								"1212",
+								"products",
+								"1213"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'PATCH' \\\r\n  'https://qa.demoshopping.ru/orders/1212/products/1213' \\\r\n  -H 'accept: */*' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"quantity\": 0\r\n}'"
+					},
+					"response": []
+				},
+				{
+					"name": "Обновление общей суммы заказов пользователя",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://qa.demoshopping.ru/update-orders-total",
+							"protocol": "https",
+							"host": [
+								"qa",
+								"demoshopping",
+								"ru"
+							],
+							"path": [
+								"update-orders-total"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'POST' \\\r\n  'https://qa.demoshopping.ru/update-orders-total' \\\r\n  -H 'accept: application/json' \\\r\n  -d ''"
+					},
+					"response": []
+				},
+				{
+					"name": "Получение данных об оплаченных заказах",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://qa.demoshopping.ru/api/orders-history",
+							"protocol": "https",
+							"host": [
+								"qa",
+								"demoshopping",
+								"ru"
+							],
+							"path": [
+								"api",
+								"orders-history"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'GET' \\\r\n  'https://qa.demoshopping.ru/api/orders-history' \\\r\n  -H 'accept: application/json'"
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Payment",
+			"item": [
+				{
+					"name": "Оплата заказов пользователя",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"card_type\": \"VISA\",\r\n  \"card_code\": \"string\",\r\n  \"expiry_month\": 0,\r\n  \"expiry_year\": 0,\r\n  \"cvv\": \"string\",\r\n  \"email\": \"user@example.com\",\r\n  \"email_paypal\": \"user@example.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://qa.demoshopping.ru/pay",
+							"protocol": "https",
+							"host": [
+								"qa",
+								"demoshopping",
+								"ru"
+							],
+							"path": [
+								"pay"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'POST' \\\r\n  'https://qa.demoshopping.ru/pay' \\\r\n  -H 'accept: */*' \\\r\n  -H 'Content-Type: application/json' \\\r\n  -d '{\r\n  \"card_type\": \"VISA\",\r\n  \"card_code\": \"string\",\r\n  \"expiry_month\": 0,\r\n  \"expiry_year\": 0,\r\n  \"cvv\": \"string\",\r\n  \"email\": \"user@example.com\",\r\n  \"email_paypal\": \"user@example.com\"\r\n}'"
+					},
+					"response": []
+				},
+				{
+					"name": "Обновление балансов карт",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://qa.demoshopping.ru/updateBalances",
+							"protocol": "https",
+							"host": [
+								"qa",
+								"demoshopping",
+								"ru"
+							],
+							"path": [
+								"updateBalances"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'GET' \\\r\n  'https://qa.demoshopping.ru/updateBalances' \\\r\n  -H 'accept: application/json'"
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": "https://qa.demoshopping.ru",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "productID",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user",
+			"value": "Yana",
+			"type": "string"
+		},
+		{
+			"key": "pass",
+			"value": "Yana123456",
+			"type": "string"
+		},
+		{
+			"key": "cart_item_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
