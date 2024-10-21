@@ -1,10 +1,11 @@
 # Тестирование API
+Применение знаний и навыков в Postman, Charles Proxy.
 
-[Коллекция DemoShopping](https://github.com/Yaniklkiss/api/blob/main/DemoShopping.postman_collection.json)
+[Коллекция DemoShopping](https://github.com/Yaniklkiss/api/blob/main/DemoShopping.postman_collection.json) (GET, PUT, PATCH, DELETE, POST) 
 
 [Автотесты для Products](https://github.com/Yaniklkiss/api/blob/main/DemoShopping.postman_test_run.json)
 
-[Коллецкия SOAP](https://github.com/Yaniklkiss/api/blob/main/SOAP.postman_collection.json)
+[Коллецкия SOAP](https://github.com/Yaniklkiss/api/blob/main/SOAP.postman_collection.json) Тестирование сервиса CountryInfoService
 
 [Тест-кейсы для методов](https://github.com/Yaniklkiss/api/blob/main/test%20cases%20api.pdf)
 
